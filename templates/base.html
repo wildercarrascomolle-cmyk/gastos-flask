@@ -1,0 +1,33 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{% block titulo %}{% endblock %} · Control de Gastos</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/estilos.css') }}">
+</head>
+<body>
+{% if session.usuario %}
+<header class="cabecera">
+    <div class="env cabecera__fila">
+        <a class="marca" href="{{ url_for('gastos') }}"><span class="marca__icono">S/</span>Control de Gastos</a>
+        <nav class="menu">
+            <a href="{{ url_for('gastos') }}" class="{{ 'activo' if request.endpoint == 'gastos' }}">Gastos</a>
+            <a href="{{ url_for('reporte') }}" class="{{ 'activo' if request.endpoint == 'reporte' }}">Reporte</a>
+            <span class="menu__usuario">{{ session.usuario }}</span>
+            <form method="post" action="{{ url_for('salir') }}" class="en-linea">
+                <input type="hidden" name="_csrf" value="{{ csrf_token() }}">
+                <button class="menu__salir">Salir</button>
+            </form>
+        </nav>
+    </div>
+</header>
+{% endif %}
+<main class="env contenido">
+    {% with mensajes = get_flashed_messages(with_categories=true) %}
+        {% for cat, msg in mensajes %}<div class="alerta alerta--{{ cat }}">{{ msg }}</div>{% endfor %}
+    {% endwith %}
+    {% block contenido %}{% endblock %}
+</main>
+</body>
+</html>

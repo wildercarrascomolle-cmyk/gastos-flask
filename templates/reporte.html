@@ -1,0 +1,53 @@
+{% extends "base.html" %}
+{% block titulo %}Reporte{% endblock %}
+{% block contenido %}
+<div class="encabezado">
+    <div>
+        <h1>Reporte de gastos</h1>
+        <p class="sub">{% if desde or hasta %}Del {{ desde|fecha if desde else 'inicio' }} al {{ hasta|fecha if hasta else 'día de hoy' }}{% else %}Todos los gastos{% endif %} · generado el {{ generado }}</p>
+    </div>
+    <a class="boton boton--sec" href="{{ url_for('reporte_csv', desde=desde, hasta=hasta) }}">Descargar CSV (Excel)</a>
+</div>
+
+<form method="get" class="tarjeta filtros">
+    <label class="campo">Desde<input type="date" name="desde" value="{{ desde }}"></label>
+    <label class="campo">Hasta<input type="date" name="hasta" value="{{ hasta }}"></label>
+    <button class="boton">Generar reporte</button>
+    <a class="boton boton--sec" href="{{ url_for('reporte') }}">Limpiar</a>
+</form>
+
+<div class="kpis">
+    <div class="kpi kpi--principal"><span>Total del periodo</span><strong>{{ total|soles }}</strong></div>
+    <div class="kpi"><span>Número de gastos</span><strong>{{ filas|length }}</strong></div>
+    <div class="kpi"><span>Gasto promedio</span><strong>{{ promedio|soles }}</strong></div>
+    <div class="kpi"><span>Gasto mayor</span><strong>{{ mayor.monto|soles if mayor else '—' }}</strong>{% if mayor %}<small>{{ mayor.descripcion }}</small>{% endif %}</div>
+</div>
+
+{% if meses %}
+<section class="tarjeta">
+    <h2>Total por mes</h2>
+    {% for m in meses %}
+    <div class="barra">
+        <span>{{ m.nombre }}</span>
+        <progress max="100" value="{{ m.porcentaje }}"></progress>
+        <strong class="num">{{ m.total|soles }}</strong>
+    </div>
+    {% endfor %}
+</section>
+{% endif %}
+
+<section class="tarjeta">
+    <h2>Detalle</h2>
+    {% if filas %}
+    <div class="tabla-env">
+    <table class="tabla">
+        <thead><tr><th>#</th><th>Fecha</th><th>Descripción</th><th class="num">Monto</th></tr></thead>
+        <tbody>
+        {% for f in filas %}<tr><td>{{ loop.index }}</td><td>{{ f.fecha|fecha }}</td><td>{{ f.descripcion }}</td><td class="num">{{ f.monto|soles }}</td></tr>{% endfor %}
+        </tbody>
+        <tfoot><tr><td colspan="3">Total</td><td class="num">{{ total|soles }}</td></tr></tfoot>
+    </table>
+    </div>
+    {% else %}<p class="vacio">No hay gastos en este periodo.</p>{% endif %}
+</section>
+{% endblock %}

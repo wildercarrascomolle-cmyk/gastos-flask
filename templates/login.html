@@ -1,0 +1,16 @@
+{% extends "base.html" %}
+{% block titulo %}Acceso{% endblock %}
+{% block contenido %}
+<div class="acceso">
+    <div class="acceso__marca"><span class="marca__icono marca__icono--grande">S/</span></div>
+    <h1>Control de Gastos</h1>
+    <p class="sub">Ingrese sus credenciales para continuar.</p>
+    {% with mensajes = get_flashed_messages(with_categories=true) %}{% endwith %}
+    <form method="post" class="tarjeta form">
+        <input type="hidden" name="_csrf" value="{{ csrf_token() }}">
+        <label class="campo">Usuario<input name="usuario" value="{{ usuario }}" autocomplete="username" required autofocus></label>
+        <label class="campo">Clave<input name="clave" type="password" autocomplete="current-password" required></label>
+        <button class="boton boton--bloque">Ingresar</button>
+    </form>
+</div>
+{% endblock %}

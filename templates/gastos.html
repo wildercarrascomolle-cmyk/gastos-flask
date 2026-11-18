@@ -1,0 +1,51 @@
+{% extends "base.html" %}
+{% block titulo %}Gastos{% endblock %}
+{% block contenido %}
+<div class="kpis">
+    <div class="kpi kpi--principal"><span>Gastado en {{ resumen.nombre_mes }}</span><strong>{{ resumen.mes|soles }}</strong></div>
+    <div class="kpi"><span>Total registrado</span><strong>{{ resumen.total|soles }}</strong></div>
+    <div class="kpi"><span>Gastos registrados</span><strong>{{ resumen.cantidad }}</strong></div>
+</div>
+
+<div class="rejilla">
+<section class="tarjeta">
+    <h2>Nuevo gasto</h2>
+    {% if errores %}<div class="alerta alerta--error"><ul>{% for e in errores %}<li>{{ e }}</li>{% endfor %}</ul></div>{% endif %}
+    <form method="post" class="form">
+        <input type="hidden" name="_csrf" value="{{ csrf_token() }}">
+        <label class="campo">Fecha<input type="date" name="fecha" value="{{ datos.fecha }}" max="{{ resumen.hoy }}" required></label>
+        <label class="campo">Descripción<input name="descripcion" value="{{ datos.descripcion }}" maxlength="120" placeholder="Ej. Almuerzo, pasaje, recibo de luz" required></label>
+        <label class="campo">Monto (S/)<input name="monto" value="{{ datos.monto }}" inputmode="decimal" placeholder="0.00" required></label>
+        <button class="boton boton--bloque">Registrar gasto</button>
+    </form>
+</section>
+
+<section class="tarjeta">
+    <div class="tarjeta__cab"><h2>Mis gastos</h2><a href="{{ url_for('reporte') }}">Ver reporte →</a></div>
+    {% if filas %}
+    <div class="tabla-env">
+    <table class="tabla">
+        <thead><tr><th>Fecha</th><th>Descripción</th><th class="num">Monto</th><th></th></tr></thead>
+        <tbody>
+        {% for f in filas %}
+            <tr>
+                <td>{{ f.fecha|fecha }}</td>
+                <td>{{ f.descripcion }}</td>
+                <td class="num">{{ f.monto|soles }}</td>
+                <td class="num">
+                    <form method="post" action="{{ url_for('eliminar', id_gasto=f.id) }}" class="en-linea">
+                        <input type="hidden" name="_csrf" value="{{ csrf_token() }}">
+                        <button class="eliminar" title="Eliminar">Eliminar</button>
+                    </form>
+                </td>
+            </tr>
+        {% endfor %}
+        </tbody>
+    </table>
+    </div>
+    {% else %}
+    <p class="vacio">Aún no hay gastos. Registre el primero con el formulario.</p>
+    {% endif %}
+</section>
+</div>
+{% endblock %}
